@@ -1,6 +1,6 @@
 const express = require('express');
 const axios = require('axios'); // 🔥 Import d'Axios
-const Message = require('../models/chat');
+const Message = require('../models/message');
 const router = express.Router();
 
 // Route pour envoyer une question à Ollama
