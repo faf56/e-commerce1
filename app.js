@@ -5,8 +5,11 @@ const CategorieRouter=require("./routes/categorie.route")
 const scategorieRouter = require("./routes/scategorie.route")
 const articleRouter =require("./routes/article.route")
 const chatbotRouter=require("./routes/chatbot.route")
+const userRouter =require("./routes/user.route")
 const dotenv=require("dotenv")
+const cors=require("cors")
 app.use(express.json())
+app.use(cors())
 dotenv.config()
 
 app.get('/',(req,res)=>{
@@ -22,6 +25,7 @@ app.use("/api/categories",CategorieRouter)
 app.use('/api/scategories', scategorieRouter)
 app.use('/api/articles', articleRouter);
 app.use("/api/chat",chatbotRouter);
+app.use('/api/users', userRouter);
 app.listen(process.env.PORT,function(){
     console.log("serveur is listen on port 4000")
 })
