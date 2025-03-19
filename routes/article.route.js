@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Article=require("../models/article")
 const Scategorie =require("../models/scategorie")
+const {verifyToken} =require("../middleware/verifytoken")
+const {authorizeRoles} = require("../middleware/authorizeRoles")
+const {generateMongoQuery} = require("../query/generateMongoQuery");
+
 // afficher la liste des articles.
 router.get('/', async (req, res, )=> {
 try {
@@ -21,7 +25,7 @@ res.status(200).json(nouvarticle );
 } catch (error) {
 res.status(404).json({ message: error.message });
 
-24
+
 
 }
 });
@@ -102,4 +106,79 @@ router.get('/cat/:categorieID', async (req, res) => {
     res.status(404).json({ message: error.message });
     }
     });
+
+
+    router.post("/query", async (req, res) => {
+        try {
+        const { text } = req.body;
+        if (!text) return res.status(400).json({ error: "Aucune requête fournie."
+        
+        });
+        
+        console.log(" Requête reçue:", text);
+        // Générer la requête MongoDB via LLaMA 3
+        const mongoQuery = await generateMongoQuery(text);
+        console.log(" Requête MongoDB générée avant correction:", mongoQuery);
+        let query = mongoQuery.filter || {};
+        const sort = mongoQuery.sort || { _id: -1 };
+        const limit = mongoQuery.limit ? parseInt(mongoQuery.limit) : 0;
+        const skip = mongoQuery.skip ? parseInt(mongoQuery.skip) : 0;
+        let scategorieName = null;
+        // Vérification et correction de `souscategorie`
+        if (query.scategorie) {
+        scategorieName = query.scategorie;
+        delete query.scategorie; // Supprimer `souscategorie` qui est incorrect
+        } else if (query.scategorieID && typeof query.scategorieID === "string") {
+        scategorieName = query.scategorieID;
+        }
+        if (scategorieName) {
+        console.log(" Recherche de l'ID de la sous-catégorie pour :",
+        
+        scategorieName);
+        
+        // Chercher l'ObjectId correspondant à la sous-catégorie
+        const scategorie = await Scategorie.findOne({
+        nomscategorie: { $regex: scategorieName, $options: "i" }
+        });
+        if (!scategorie) {
+        console.log(" Aucune sous-catégorie trouvée pour:", scategorieName);
+        return res.json({ result: [] });
+        }
+        
+        console.log("Sous-catégorie trouvée:", scategorie._id);
+        query.scategorieID = scategorie._id; // Remplacement par l'ObjectId
+        
+        correct
+        }
+        console.log(" Requête finale exécutée sur MongoDB:", JSON.stringify(query,null, 2));
+        
+        // Détection si l'utilisateur demande un comptage
+        if (/nombre|combien|count/i.test(text)) {
+        const count = await Article.countDocuments(query);
+        console.log(`📊 Nombre d'articles trouvés: ${count}`);
+        return res.json({ count });
+        }
+        // Exécution de la requête avec jointure complète si ce n'est pas un comptage
+        
+        const result = await Article.find(query)
+        .populate({
+        path: "scategorieID",
+        populate: { path: "categorieID" }
+        })
+        .sort(sort)
+        .skip(skip)
+        .limit(limit > 0 ? limit : 0)
+        .exec();
+        console.log(` ${result.length} articles trouvés.`);
+        res.json({ result });
+        } catch (error) {
+        console.error(" Erreur serveur:", error);
+        res.status(500).json({ error: "Erreur serveur" });
+        }
+        });
+
+
+
+
+
 module.exports = router;
