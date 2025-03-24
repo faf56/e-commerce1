@@ -22,7 +22,7 @@ const token = header && header.split('Bearer ')[1];
 
 if (!token) return res.status(403).send({ success: false, message: 'Notoken provided' });
 
-jwt.verify(token, process.env.SECRET, (err, decoded) => {
+jwt.verify(token, process.env.SECRET_TOKEN, (err, decoded) => {
 
 if (err) return res.status(403).send({ success: false, message:
 
