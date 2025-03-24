@@ -84,7 +84,7 @@ router.get('/status/edit/', async (req, res) => {
 
 // se connecter
 router.post('/login', async (req, res) => {
-    const SECRET=123456
+    
     try {
     let { email, password } = req.body
     
@@ -111,7 +111,7 @@ router.post('/login', async (req, res) => {
     
     false, message: 'Your account is inactive, Please contact your administrator' })
     
-    const token = jwt.sign ({ iduser:user._id,name:user.firstname, role: user.role }, SECRET, {
+    const token = jwt.sign ({ iduser:user._id,name:user.firstname, role: user.role }, process.env.SECRET, {
     expiresIn: "1h", })
     
     return res.status(200).send({ success: true, user, token })
