@@ -111,16 +111,13 @@ router.post('/login', async (req, res) => {
     
     false, message: 'Your account is inactive, Please contact your administrator' })
     
-    const token = jwt.sign ({ iduser:user._id,name:user.firstname, role: user.role }, process.env.SECRET_TOKEN, {
-    expiresIn: "1h", })
+    const token = jwt.sign ({ iduser:user._id,name:user.firstname, role: user.role }, process.env.SECRET_TOKEN, {expiresIn: "1h", })
     
     return res.status(200).send({ success: true, user, token })
     
     } else {
     
-    return res.status(404).send({ success: false, message:
-    
-    "Please verify your credentials" })
+    return res.status(404).send({ success: false, message:"Please verify your credentials" })
     
     }
     

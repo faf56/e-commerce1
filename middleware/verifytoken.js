@@ -24,9 +24,7 @@ if (!token) return res.status(403).send({ success: false, message: 'Notoken prov
 
 jwt.verify(token, process.env.SECRET_TOKEN, (err, decoded) => {
 
-if (err) return res.status(403).send({ success: false, message:
-
-'Invalid token' });
+if (err) return res.status(403).send({ success: false, message:'Invalid token' });
 req.user = {}
 req.user.id = decoded.iduser
 req.user.role = decoded.role
