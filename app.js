@@ -2,6 +2,7 @@ const express=require('express')
 const mongoose=require('mongoose')
 const dotenv=require("dotenv")
 const cors=require("cors")
+const path = require('path');
 const app=express()
 const CategorieRouter=require("./routes/categorie.route")
 const scategorieRouter = require("./routes/scategorie.route")
@@ -14,11 +15,11 @@ const paymentRouter =require("./routes/payement.route.js");
 app.use(express.json())
 app.use(cors())
 dotenv.config()
-
+/*
 app.get('/',(req,res)=>{
     res.send("bienvenue dans notre site")
 })
-
+*/
 //connection base de donnée
 mongoose.connect(process.env.DATABASECLOUD)
 .then(()=>{console.log("connection a la base de données reussie")})
@@ -33,11 +34,11 @@ app.use('/api/users', userRouter);
 app.use('/api/chatbot', chatbotRequeteRouter);
 app.use('/api/payment', paymentRouter);
 
-/*//dist reactjs
+//dist reactjs
 app.use(express.static(path.join(__dirname, './client/build'))); // Route pourles pages non trouvées, redirige vers index.html
 app.get('*', (req, res) => { res.sendFile(path.join(__dirname,
 './client/build/index.html')); });
-*/
+
 // serveur
 app.listen(process.env.PORT,function(){
     console.log("serveur is listen on port 4000")
